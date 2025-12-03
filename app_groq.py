@@ -341,14 +341,14 @@ if submit:
         ignore_index=True
     )
 
-    # -------------------------
+        # -------------------------
     #    LLAMADA AL MODELO GROQ (CON LOADING)
     # -------------------------
     with st.spinner("⏳ Analizando datos del estanque y generando informe..."):
         start = time.time()
 
         completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "user",
@@ -379,6 +379,16 @@ Interpretación, Problemas detectados y Recomendaciones.
 
         inicio = resultado_limpio.lower().find("informe técnico")
         resultado_final = resultado_limpio[inicio:] if inicio != -1 else resultado_limpio
+
+        # =====================
+        #  GUARDAR EN SUPABASE
+        # =====================
+        ahora = datetime.now()
+        fecha = ahora.date().isoformat()
+        hora = ahora.time().strftime("%H:%M:%S")
+
+        texto_observacion = observaciones_procesadas
+
         try:
             supabase.table("mediciones").insert({
                 "fecha": fecha,
@@ -393,20 +403,18 @@ Interpretación, Problemas detectados y Recomendaciones.
                 "observacion": texto_observacion,
             }).execute()
 
-    st.info("📡 Registro guardado en la base histórica.")
+            st.info("📡 Registro guardado en la base histórica.")
 
-except Exception as e:
-    st.warning("⚠️ Error al guardar en Supabase.")
-    print("Error:", e)
-
+        except Exception as e:
+            st.warning("⚠️ Error al guardar en Supabase.")
+            print("Error Supabase:", e)
 
         elapsed = time.time() - start
 
     st.success(f"⚡ Reporte generado en {elapsed:.2f} segundos")
-
     st.markdown("🧠 Resultado del análisis")
     st.markdown(resultado_final)
-    
+   
 # ==========================
 #        FOOTER
 # ==========================
@@ -451,7 +459,6 @@ if st.button("📥 Descargar histórico en Excel"):
             # Orden exacto de columnas
             df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
 
-            import io
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
                 df.to_excel(writer, index=False, sheet_name="Histórico")
