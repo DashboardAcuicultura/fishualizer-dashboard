@@ -379,6 +379,26 @@ Interpretación, Problemas detectados y Recomendaciones.
 
         inicio = resultado_limpio.lower().find("informe técnico")
         resultado_final = resultado_limpio[inicio:] if inicio != -1 else resultado_limpio
+        try:
+            supabase.table("mediciones").insert({
+                "fecha": fecha,
+                "hora": hora,
+                "especie": tipo_pez,
+                "temperatura": float(var1),
+                "ph": float(var2),
+                "sat_pct": float(var3),
+                "oxigeno_mg": float(var4),
+                "alcalinidad": float(var5),
+                "amonio_total": float(var6),
+                "observacion": texto_observacion,
+            }).execute()
+
+    st.info("📡 Registro guardado en la base histórica.")
+
+except Exception as e:
+    st.warning("⚠️ Error al guardar en Supabase.")
+    print("Error:", e)
+
 
         elapsed = time.time() - start
 
@@ -401,3 +421,50 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown("---")
+st.subheader("📊 Historial de mediciones")
+
+if st.button("📥 Descargar histórico en Excel"):
+    try:
+        res = supabase.table("mediciones").select("*").order("fecha", desc=True).order("hora", desc=True).execute()
+        data = res.data
+
+        if not data:
+            st.info("Aún no hay registros.")
+        else:
+            df = pd.DataFrame(data)
+
+            # Renombrar columnas para que Excel salga EXACTO como quieres
+            df = df.rename(columns={
+                "fecha": "Fecha",
+                "hora": "Hora",
+                "especie": "Especie",
+                "temperatura": "T°",
+                "ph": "pH",
+                "sat_pct": "%SAT",
+                "oxigeno_mg": "OD",
+                "alcalinidad": "ALC",
+                "amonio_total": "TAN",
+                "observacion": "Observación",
+            })
+
+            # Orden exacto de columnas
+            df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
+
+            import io
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+                df.to_excel(writer, index=False, sheet_name="Histórico")
+
+            buffer.seek(0)
+
+            st.download_button(
+                label="⬇️ Descargar Excel",
+                data=buffer,
+                file_name="historico_fishualizer.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+
+    except Exception as e:
+        st.warning("⚠️ Error al obtener el historial.")
+        print(e)
