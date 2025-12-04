@@ -460,7 +460,7 @@ if st.button("📥 Descargar histórico en Excel"):
             df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
 
             buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+            with pd.ExcelWriter(buffer) as writer:
                 df.to_excel(writer, index=False, sheet_name="Histórico")
 
             buffer.seek(0)
