@@ -451,7 +451,6 @@ with st.expander("🔒 Zona solo para personal autorizado"):
     if validar:
         if pwd == st.secrets["ADMIN_PASSWORD"]:
             st.session_state.hist_autorizado = True
-            st.success("Acceso concedido. Ahora puedes descargar el histórico.")
         else:
             st.session_state.hist_autorizado = False
             st.error("Contraseña incorrecta.")
