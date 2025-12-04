@@ -283,7 +283,7 @@ if submit:
         "Saturación de oxígeno (%)": var3,
         "Oxígeno disuelto (mg/L)": var4,
         "Alcalinidad": var5,
-        "Amonio Total": var6
+        "Amonio Total": var6,
     }
 
     comparaciones = []
@@ -325,6 +325,7 @@ if submit:
         + observaciones
     )
 
+    # Guarda también en la sesión local (por si después quieres usarlo)
     nuevo_registro = {
         "Temperatura": var1,
         "pH": var2,
@@ -333,15 +334,24 @@ if submit:
         "Alcalinidad": var5,
         "Amonio Total": var6,
         "Tipo pejerrey": tipo_pez,
-        "Observaciones": observaciones_procesadas
+        "Observaciones": observaciones_procesadas,
     }
 
     st.session_state.datos = pd.concat(
         [st.session_state.datos, pd.DataFrame([nuevo_registro])],
-        ignore_index=True
+        ignore_index=True,
     )
 
-        # -------------------------
+    # =====================
+    #   TIMESTAMP + OBS
+    # =====================
+    ahora = datetime.now()
+    fecha = ahora.date().isoformat()          # YYYY-MM-DD
+    hora = ahora.time().strftime("%H:%M:%S")  # HH:MM:SS
+
+    texto_observacion = observaciones.strip() if observaciones.strip() != "" else None
+
+    # -------------------------
     #    LLAMADA AL MODELO GROQ (CON LOADING)
     # -------------------------
     with st.spinner("⏳ Analizando datos del estanque y generando informe..."):
@@ -378,30 +388,28 @@ Interpretación, Problemas detectados y Recomendaciones.
         resultado_limpio = eliminar_think(resultado)
 
         inicio = resultado_limpio.lower().find("informe técnico")
-        resultado_final = resultado_limpio[inicio:] if inicio != -1 else resultado_limpio
+        resultado_final = (
+            resultado_limpio[inicio:] if inicio != -1 else resultado_limpio
+        )
 
         # =====================
         #  GUARDAR EN SUPABASE
         # =====================
-        ahora = datetime.now()
-        fecha = ahora.date().isoformat()
-        hora = ahora.time().strftime("%H:%M:%S")
-
-        texto_observacion = observaciones.strip() if observaciones.strip() != "" else None
-
         try:
-            supabase.table("mediciones").insert({
-                "fecha": fecha,
-                "hora": hora,
-                "especie": tipo_pez,
-                "temperatura": float(var1),
-                "ph": float(var2),
-                "sat_pct": float(var3),
-                "oxigeno_mg": float(var4),
-                "alcalinidad": float(var5),
-                "amonio_total": float(var6),
-                "observacion": texto_observacion,
-            }).execute()
+            supabase.table("mediciones").insert(
+                {
+                    "fecha": fecha,
+                    "hora": hora,
+                    "especie": tipo_pez,
+                    "temperatura": float(var1),
+                    "ph": float(var2),
+                    "sat_pct": float(var3),
+                    "oxigeno_mg": float(var4),
+                    "alcalinidad": float(var5),
+                    "amonio_total": float(var6),
+                    "observacion": texto_observacion,
+                }
+            ).execute()
 
             st.info("📡 Registro guardado en la base histórica.")
 
@@ -414,7 +422,7 @@ Interpretación, Problemas detectados y Recomendaciones.
     st.success(f"⚡ Reporte generado en {elapsed:.2f} segundos")
     st.markdown("🧠 Resultado del análisis")
     st.markdown(resultado_final)
-   
+ 
 # ==========================
 #        FOOTER
 # ==========================
