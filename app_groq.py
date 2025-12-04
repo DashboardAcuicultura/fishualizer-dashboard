@@ -451,57 +451,55 @@ with st.expander("🔒 Zona solo para personal autorizado"):
     if validar:
         if pwd == st.secrets["ADMIN_PASSWORD"]:
             st.session_state.hist_autorizado = True
+            st.success("Acceso autorizado. Puedes descargar el histórico.")
         else:
             st.session_state.hist_autorizado = False
             st.error("Contraseña incorrecta.")
 
-    # Si ya está autorizado, mostramos el botón de descarga
+    # Si ya está autorizado, mostramos DIRECTO el botón de descarga
     if st.session_state.hist_autorizado:
-        st.success("Acceso autorizado. Puedes descargar el histórico.")
+        try:
+            res = (
+                supabase.table("mediciones")
+                .select("*")
+                .order("fecha", desc=True)
+                .order("hora", desc=True)
+                .execute()
+            )
+            data = res.data
 
-        if st.button("📥 Descargar histórico en Excel"):
-            try:
-                res = (
-                    supabase.table("mediciones")
-                    .select("*")
-                    .order("fecha", desc=True)
-                    .order("hora", desc=True)
-                    .execute()
+            if not data:
+                st.info("Aún no hay registros.")
+            else:
+                df = pd.DataFrame(data)
+
+                df = df.rename(columns={
+                    "fecha": "Fecha",
+                    "hora": "Hora",
+                    "especie": "Especie",
+                    "temperatura": "T°",
+                    "ph": "pH",
+                    "sat_pct": "%SAT",
+                    "oxigeno_mg": "OD",
+                    "alcalinidad": "ALC",
+                    "amonio_total": "TAN",
+                    "observacion": "Observación",
+                })
+
+                df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
+
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer) as writer:
+                    df.to_excel(writer, index=False, sheet_name="Histórico")
+                buffer.seek(0)
+
+                st.download_button(
+                    label="⬇️ Descargar histórico en Excel",
+                    data=buffer,
+                    file_name="historico_fishualizer.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 )
-                data = res.data
 
-                if not data:
-                    st.info("Aún no hay registros.")
-                else:
-                    df = pd.DataFrame(data)
-
-                    df = df.rename(columns={
-                        "fecha": "Fecha",
-                        "hora": "Hora",
-                        "especie": "Especie",
-                        "temperatura": "T°",
-                        "ph": "pH",
-                        "sat_pct": "%SAT",
-                        "oxigeno_mg": "OD",
-                        "alcalinidad": "ALC",
-                        "amonio_total": "TAN",
-                        "observacion": "Observación",
-                    })
-
-                    df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
-
-                    buffer = io.BytesIO()
-                    with pd.ExcelWriter(buffer) as writer:
-                        df.to_excel(writer, index=False, sheet_name="Histórico")
-                    buffer.seek(0)
-
-                    st.download_button(
-                        label="⬇️ Descargar Excel",
-                        data=buffer,
-                        file_name="historico_fishualizer.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    )
-
-            except Exception as e:
-                st.warning("⚠️ Error al obtener el historial.")
-                print(e)
+        except Exception as e:
+            st.warning("⚠️ Error al obtener el historial.")
+            print(e)
