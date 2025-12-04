@@ -440,46 +440,68 @@ st.markdown(
 st.markdown("---")
 st.subheader("📊 Historial de mediciones")
 
-if st.button("📥 Descargar histórico en Excel"):
-    try:
-        res = supabase.table("mediciones").select("*").order("fecha", desc=True).order("hora", desc=True).execute()
-        data = res.data
+st.markdown("---")
+st.subheader("📊 Historial de mediciones")
 
-        if not data:
-            st.info("Aún no hay registros.")
-        else:
-            df = pd.DataFrame(data)
+# Estado de autenticación para descargas
+if "hist_autorizado" not in st.session_state:
+    st.session_state.hist_autorizado = False
 
-            # Renombrar columnas para que Excel salga EXACTO como quieres
-            df = df.rename(columns={
-                "fecha": "Fecha",
-                "hora": "Hora",
-                "especie": "Especie",
-                "temperatura": "T°",
-                "ph": "pH",
-                "sat_pct": "%SAT",
-                "oxigeno_mg": "OD",
-                "alcalinidad": "ALC",
-                "amonio_total": "TAN",
-                "observacion": "Observación",
-            })
+with st.expander("🔒 Zona solo para personal autorizado"):
+    if not st.session_state.hist_autorizado:
+        pwd = st.text_input("Ingresa la contraseña", type="password")
+        if st.button("✅ Validar acceso"):
+            if pwd == st.secrets["ADMIN_PASSWORD"]:
+                st.session_state.hist_autorizado = True
+                st.success("Acceso concedido. Ahora puedes descargar el histórico.")
+            else:
+                st.error("Contraseña incorrecta.")
+    else:
+        st.success("Acceso autorizado. Puedes descargar el histórico.")
 
-            # Orden exacto de columnas
-            df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
+        if st.button("📥 Descargar histórico en Excel"):
+            try:
+                res = (
+                    supabase.table("mediciones")
+                    .select("*")
+                    .order("fecha", desc=True)
+                    .order("hora", desc=True)
+                    .execute()
+                )
+                data = res.data
 
-            buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer) as writer:
-                df.to_excel(writer, index=False, sheet_name="Histórico")
+                if not data:
+                    st.info("Aún no hay registros.")
+                else:
+                    df = pd.DataFrame(data)
 
-            buffer.seek(0)
+                    df = df.rename(columns={
+                        "fecha": "Fecha",
+                        "hora": "Hora",
+                        "especie": "Especie",
+                        "temperatura": "T°",
+                        "ph": "pH",
+                        "sat_pct": "%SAT",
+                        "oxigeno_mg": "OD",
+                        "alcalinidad": "ALC",
+                        "amonio_total": "TAN",
+                        "observacion": "Observación",
+                    })
 
-            st.download_button(
-                label="⬇️ Descargar Excel",
-                data=buffer,
-                file_name="historico_fishualizer.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            )
+                    df = df[["Fecha","Hora","Especie","T°","pH","%SAT","OD","ALC","TAN","Observación"]]
 
-    except Exception as e:
-        st.warning("⚠️ Error al obtener el historial.")
-        print(e)
+                    buffer = io.BytesIO()
+                    with pd.ExcelWriter(buffer) as writer:
+                        df.to_excel(writer, index=False, sheet_name="Histórico")
+                    buffer.seek(0)
+
+                    st.download_button(
+                        label="⬇️ Descargar Excel",
+                        data=buffer,
+                        file_name="historico_fishualizer.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
+
+            except Exception as e:
+                st.warning("⚠️ Error al obtener el historial.")
+                print(e)
