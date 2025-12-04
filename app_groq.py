@@ -440,9 +440,6 @@ st.markdown(
 st.markdown("---")
 st.subheader("📊 Historial de mediciones")
 
-st.markdown("---")
-st.subheader("📊 Historial de mediciones")
-
 # Estado de autenticación para descargas
 if "hist_autorizado" not in st.session_state:
     st.session_state.hist_autorizado = False
