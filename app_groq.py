@@ -445,15 +445,19 @@ if "hist_autorizado" not in st.session_state:
     st.session_state.hist_autorizado = False
 
 with st.expander("🔒 Zona solo para personal autorizado"):
-    if not st.session_state.hist_autorizado:
-        pwd = st.text_input("Ingresa la contraseña", type="password")
-        if st.button("✅ Validar acceso"):
-            if pwd == st.secrets["ADMIN_PASSWORD"]:
-                st.session_state.hist_autorizado = True
-                st.success("Acceso concedido. Ahora puedes descargar el histórico.")
-            else:
-                st.error("Contraseña incorrecta.")
-    else:
+    pwd = st.text_input("Ingresa la contraseña", type="password")
+    validar = st.button("✅ Validar acceso")
+
+    if validar:
+        if pwd == st.secrets["ADMIN_PASSWORD"]:
+            st.session_state.hist_autorizado = True
+            st.success("Acceso concedido. Ahora puedes descargar el histórico.")
+        else:
+            st.session_state.hist_autorizado = False
+            st.error("Contraseña incorrecta.")
+
+    # Si ya está autorizado, mostramos el botón de descarga
+    if st.session_state.hist_autorizado:
         st.success("Acceso autorizado. Puedes descargar el histórico.")
 
         if st.button("📥 Descargar histórico en Excel"):
