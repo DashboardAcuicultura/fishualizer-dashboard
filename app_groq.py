@@ -387,7 +387,7 @@ Interpretación, Problemas detectados y Recomendaciones.
         fecha = ahora.date().isoformat()
         hora = ahora.time().strftime("%H:%M:%S")
 
-        texto_observacion = observaciones_procesadas
+        texto_observacion = observaciones.strip() if observaciones.strip() != "" else None
 
         try:
             supabase.table("mediciones").insert({
