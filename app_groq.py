@@ -271,7 +271,7 @@ with st.form("formulario"):
 
     # 🔒 NUEVO: control para decidir si se guarda o no en la BD
     guardar_en_bd = st.checkbox(
-        "Registrar esta medición en la base de datos (solo datos reales)",
+        "Registrar esta medición en la base de datos",
         value=False,
     )
     
@@ -441,7 +441,7 @@ st.markdown(
     """
     <hr style="margin-top:3rem; margin-bottom:1rem;">
     <div style="text-align:center; color:#6b7280; font-size:0.85rem;">
-        Fishualizer v1.0 — Proyecto desarrollado en la Universidad Católica del Norte<br>
+        Fishualizer v1.1 — Proyecto desarrollado en la Universidad Católica del Norte<br>
         © 2025 — Fernando Véliz & Benjamín Celis
     </div>
     """,
