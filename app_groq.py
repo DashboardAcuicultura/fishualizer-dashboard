@@ -268,6 +268,13 @@ with st.form("formulario"):
 
     tipo_pez = st.selectbox("Que especie de pejerrey es", ("Chileno", "Argentino"))
     observaciones = st.text_area("Observaciones adicionales")
+
+    # 🔒 NUEVO: control para decidir si se guarda o no en la BD
+    guardar_en_bd = st.checkbox(
+        "Registrar esta medición en la base de datos (solo datos reales)",
+        value=False,
+    )
+    
     submit = st.form_submit_button("🔍 Generar reporte")
 
 # -----------------------------
@@ -392,30 +399,34 @@ Interpretación, Problemas detectados y Recomendaciones.
             resultado_limpio[inicio:] if inicio != -1 else resultado_limpio
         )
 
+                # =====================
+        #  GUARDAR EN SUPABASE (SI EL USUARIO LO PERMITE)
         # =====================
-        #  GUARDAR EN SUPABASE
-        # =====================
-        try:
-            supabase.table("mediciones").insert(
-                {
-                    "fecha": fecha,
-                    "hora": hora,
-                    "especie": tipo_pez,
-                    "temperatura": float(var1),
-                    "ph": float(var2),
-                    "sat_pct": float(var3),
-                    "oxigeno_mg": float(var4),
-                    "alcalinidad": float(var5),
-                    "amonio_total": float(var6),
-                    "observacion": texto_observacion,
-                }
-            ).execute()
+        if guardar_en_bd:
+            try:
+                supabase.table("mediciones").insert(
+                    {
+                        "fecha": fecha,
+                        "hora": hora,
+                        "especie": tipo_pez,
+                        "temperatura": float(var1),
+                        "ph": float(var2),
+                        "sat_pct": float(var3),
+                        "oxigeno_mg": float(var4),
+                        "alcalinidad": float(var5),
+                        "amonio_total": float(var6),
+                        "observacion": texto_observacion,
+                    }
+                ).execute()
 
-            st.info("📡 Registro guardado en la base histórica.")
+                st.info("📡 Registro guardado en la base histórica.")
 
-        except Exception as e:
-            st.warning("⚠️ Error al guardar en Supabase.")
-            print("Error Supabase:", e)
+            except Exception as e:
+                st.warning("⚠️ Error al guardar en Supabase.")
+                print("Error Supabase:", e)
+        else:
+            st.info("🧪 Modo prueba: la medición NO se guardó en la base de datos.")
+
 
         elapsed = time.time() - start
 
