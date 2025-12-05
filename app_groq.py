@@ -424,13 +424,9 @@ Interpretación, Problemas detectados y Recomendaciones.
             except Exception as e:
                 st.warning("⚠️ Error al guardar en Supabase.")
                 print("Error Supabase:", e)
-        else:
-            st.info("🧪 Modo prueba: la medición NO se guardó en la base de datos.")
-
 
         elapsed = time.time() - start
 
-    st.success(f"⚡ Reporte generado en {elapsed:.2f} segundos")
     st.markdown("🧠 Resultado del análisis")
     st.markdown(resultado_final)
  
