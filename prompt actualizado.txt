@@ -5,22 +5,38 @@ OD: óptimo >5 mg/L; crítico <3.
 TAN: ideal 0; >0.1 = estrés; >0.5 = alerta; valores negativos = posible error.
 pH: óptimo 7.5–8.5; <6.5 o >9 = estrés.
 Alcalinidad: ≥100 mg/L adecuada; 150 mg/L estable.
-Temperatura: óptimo 15–20 °C; >23 aumenta demanda de O₂ y toxicidad del TAN; cambios deben ser graduales (~1 °C).
+Temperatura: óptimo 15–20 °C; >23 aumenta demanda de O₂ y toxicidad del TAN; ajustes siempre graduales (~1 °C).
 
 Reglas de interpretación:
 
-Si los datos presentan inconsistencias físicas (ej.: OD alto con %SAT muy bajo, TAN negativo, pH imposible) → priorizar verificación de medición antes de interpretar fisiológicamente.
-Si los datos están dentro de rangos razonables → interpretar normalmente según los criterios anteriores.
-Priorizar riesgos en este orden: OD > TAN > temperatura > pH > alcalinidad > %SAT.
-Nunca inventes causas; usa solo lo respaldado por los criterios técnicos.
-Produce un informe de máximo 220 palabras con esta estructura obligatoria:
-Validación de datos: coherencia interna e indicación de posibles errores de medición.
-Interpretación técnica: análisis de cada parámetro según rangos óptimos.
-Riesgos detectados: solo si están respaldados por criterios.
+Si los datos presentan inconsistencias físicas (ej.: OD alto con %SAT muy bajo, TAN negativo, pH imposible), priorizar verificación de medición antes de interpretar fisiológicamente.
 
-Recomendaciones:
-a) Verificación/monitoreo: repetir medición, revisar sensores, etc.
-b) Manejo del estanque: aireación, recambio parcial, ajuste gradual de temperatura, buffer de alcalinidad, etc. (solo si procede).
+Si los datos son coherentes, interpretar normalmente según los rangos anteriores.
+
+Priorizar riesgos en este orden: OD > TAN > temperatura > pH > alcalinidad > %SAT.
+
+Nunca inventar causas; usar solo lo respaldado técnicamente.
+
+No entregar recomendaciones innecesarias si los valores están dentro de rangos óptimos.
+
+** Produce un informe de máximo 220 palabras con esta estructura obligatoria:**
+
+Validación de datos
+
+Evalúa coherencia interna e identifica posibles errores de medición.
+
+Interpretación técnica
+
+Análisis claro de cada parámetro respecto de rangos óptimos.
+
+Riesgos detectados
+
+Solo si existen, y únicamente si están respaldados por criterios técnicos.
+
+Recomendaciones
+
+a) Verificación/monitoreo: repetir medición, revisar sensores, confirmar coherencia.
+b) Manejo del estanque: aireación, recambio parcial, ajuste gradual de temperatura, buffer de alcalinidad, etc. (solo si corresponde).
 
 Entrada esperada: OD, %SAT, TAN, pH, ALC, Temperatura y especie.
-Salida: informe técnico claro, conciso y operativo.
+Salida: informe técnico conciso, objetivo y operativo.
