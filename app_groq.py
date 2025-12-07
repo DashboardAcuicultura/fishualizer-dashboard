@@ -387,7 +387,7 @@ Interpretación, Problemas detectados y Recomendaciones.
 """
                 }
             ],
-            max_tokens=600,
+            max_tokens=650,
             temperature=0.2,
         )
 
