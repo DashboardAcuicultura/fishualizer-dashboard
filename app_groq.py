@@ -181,6 +181,32 @@ div[data-testid="InputInstructions"] {
     height: 70px;   
     width: auto;
 }
+/* ===== Ajustes SOLO para pantallas pequeñas (celular) ===== */
+@media (max-width: 600px) {
+
+    .header-bar {
+        padding: 0.6rem 1.2rem;          /* un poco más compacto */
+        gap: 0.5rem;
+    }
+
+    .header-left {
+        gap: 0.4rem;
+    }
+
+    .header-logo-fish {
+        font-size: 2.0rem;               /* pez más chico */
+    }
+
+    .header-title {
+        font-size: 1.3rem;               /* texto más chico */
+        letter-spacing: 0.12em;
+    }
+
+    .header-logo-ucn {
+        height: 62px;                    /* logo UCN más grande en proporción */
+        width: auto;
+    }
+}
 </style>
 """
 
